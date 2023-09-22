@@ -24,9 +24,8 @@ data:
 
     listen stats
         mode http
-        bind *:5000
+        bind *:7000
         stats enable
-        stats show-legends
         stats refresh 5s
         stats uri /
         stats auth status:status
@@ -39,8 +38,9 @@ data:
 
 
     backend pdns-server
+        mode tcp
         balance roundrobin
         option httpchk
-        server pdns-01 10.0.4.103:80 maxconn 100 check send-proxy
-        server pdns-02 10.0.4.104:80 maxconn 100 check send-proxy
-        server pdns-03 10.0.4.105:80 maxconn 100 check send-proxy
+        server pdns-01 10.0.4.103:80 maxconn 100 check
+        server pdns-02 10.0.4.104:80 maxconn 100 check
+        server pdns-03 10.0.4.105:80 maxconn 100 check
