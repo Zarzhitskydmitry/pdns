@@ -2,24 +2,24 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: pdns 
-  name: haproxy-pgs
+  name: haproxy-pdns
   labels:
-    app: haproxy
+    app: haproxy-pdns
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: haproxy
-      tier: backend
+      app: haproxy-pdns
+      tier: frontend
   template:
     metadata:
       labels:
-        app: haproxy
-        tier: backend
+        app: haproxy-pdns
+        tier: frontend
     spec:
       containers:
-      - name: haproxy
-        image: zarzhitskydmitry/haproxy:alpine-2.8
+      - name: haproxy-pdns
+        image: haproxy:2.8-alpine
         imagePullPolicy: IfNotPresent
         resources:
           requests:
@@ -32,24 +32,13 @@ spec:
             - name: http
               protocol: TCP 
               containerPort: 80
-            - name: stats
-              protocol: TCP 
-              containerPort: 7000
-            - name: pgs
-              protocol: TCP 
-              containerPort: 5000
         volumeMounts:
-            - mountPath: /var/log/
-              name: harpoxy-log
             - mountPath: "/usr/local/etc/haproxy/"
               name: haproxy-cfg
               readOnly: true
         command: ["sh"]
         args: ["-c", "haproxy -f /usr/local/etc/haproxy/haproxy.cfg"]
       volumes:
-          - name: harpoxy-log
-            persistentVolumeClaim:
-              claimName: harpoxy-log-claim
           - name: haproxy-cfg
             configMap:
               name: haproxy-config

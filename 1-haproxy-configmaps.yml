@@ -1,20 +1,27 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: haproxy-config
+  name: haproxy-pdns-config
   namespace: pdns
   labels:
-    app: haproxy
+    app: haproxy-pdns
 data:
   haproxy.cfg: |
     global
-        log 127.0.0.1 local0
+        log /dev/log local0
+        log /dev/log local1 notice
         maxconn 100
+        chroot /var/lib/haproxy
+        stats timeout 30s
+        user haproxy
+        group haproxy
+        daemon
 
     defaults
         log global
-        mode tcp
+        mode http
         retries 3
+        option httplog
         timeout client 30m
         timeout connect 4s
         timeout server 30m
@@ -22,16 +29,25 @@ data:
 
     listen stats
         mode http
-        bind *:80
-        stats enable
-        stats uri /
-
-    listen postgres
         bind *:5000
+        stats enable
+        stats show-legends
+        stats refresh 5s
+        stats uri /
+        stats auth status:status
+
+    frontend https-in
+        log /dev/log local0
+        mode http
+        option tcplog
+        bind *:80
+        default_backend pdns-server
+
+
+    backend pdns-server
+        mode http
+        balance roundrobin
         option httpchk
-        http-check expect status 200
-        default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
-        server pgsql-01 10.0.4.71:5432 maxconn 100 check port 8008
-        server pgsql-02 10.0.4.72:5432 maxconn 100 check port 8008
-        server pgsql-03 10.0.4.73:5432 maxconn 100 check port 8008
-  #haproxy.cfg: |
+        server pdns-01 10.0.4.103:80 maxconn 100 check send-proxy
+        server pdns-02 10.0.4.104:80 maxconn 100 check send-proxy
+        server pdns-03 10.0.4.105:80 maxconn 100 check send-proxy
