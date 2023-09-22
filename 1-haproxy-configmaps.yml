@@ -9,7 +9,6 @@ data:
   haproxy.cfg: |
     global
         log /dev/log local0
-        log /dev/log local1 notice
         maxconn 100
         chroot /var/lib/haproxy
         stats timeout 30s
@@ -39,13 +38,11 @@ data:
     frontend https-in
         log /dev/log local0
         mode http
-        option tcplog
         bind *:80
         default_backend pdns-server
 
 
     backend pdns-server
-        mode http
         balance roundrobin
         option httpchk
         server pdns-01 10.0.4.103:80 maxconn 100 check send-proxy
