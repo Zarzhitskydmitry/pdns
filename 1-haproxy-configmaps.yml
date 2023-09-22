@@ -32,10 +32,9 @@ data:
 
     listen power_admin
         mode http
-        bind *:80
+        bind *:8008
         balance roundrobin
         stats enable
         option httpchk
-        http-check expect status 200
         server pdns-01 10.0.4.103:80 maxconn 100 send-proxy check inter 2000 fall 3
         server pdns-02 10.0.4.104:80 maxconn 100 send-proxy check inter 2000 fall 3
