@@ -32,6 +32,9 @@ spec:
             - name: http
               protocol: TCP 
               containerPort: 80
+            - name: stats
+              protocol: TCP 
+              containerPort: 7000
         volumeMounts:
             - mountPath: "/usr/local/etc/haproxy/"
               name: haproxy-cfg
