@@ -10,11 +10,7 @@ data:
     global
         log /dev/log local0
         maxconn 100
-        chroot /var/lib/haproxy
         stats timeout 30s
-        user haproxy
-        group haproxy
-        daemon
 
     defaults
         log global
