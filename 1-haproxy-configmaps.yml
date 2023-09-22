@@ -30,17 +30,13 @@ data:
         stats uri /
         stats auth status:status
 
-    frontend https-in
-        log /dev/log local0
+    listen power_admin
         mode http
         bind *:80
-        default_backend pdns-server
-
-
-    backend pdns-server
-        mode tcp
         balance roundrobin
+        stats enable
         option httpchk
-        server pdns-01 10.0.4.103:80 maxconn 100 check
-        server pdns-02 10.0.4.104:80 maxconn 100 check
-        server pdns-03 10.0.4.105:80 maxconn 100 check
+        http-check expect status 200
+        server pdns-01 10.0.4.103:80 maxconn 100 check inter 2000 fall 3 port 8008
+        server pdns-02 10.0.4.104:80 maxconn 100 check inter 2000 fall 3 port 8008
+        server pdns-03 10.0.4.105:80 maxconn 100 check inter 2000 fall 3 port 8008

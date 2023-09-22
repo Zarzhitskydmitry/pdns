@@ -44,4 +44,4 @@ spec:
       volumes:
           - name: haproxy-cfg
             configMap:
-              name: haproxy-config
+              name: haproxy-pdns-config
